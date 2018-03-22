@@ -19,10 +19,9 @@ class Instance:
             for groups in response.get('SecurityGroups'):
                 self.groups.append(str(groups.get('GroupName')))
         except Exception:
-            ''' ntd '''
+            self.groups = []
 
         self.root_device = str(response.get('RootDeviceName'))
-
         try:
             self.additional_device = []
             for hdd in response.get('BlockDeviceMappings'):
@@ -30,20 +29,22 @@ class Instance:
                 tmp = [str(hdd.get('DeviceName')), str(hdd.get('Ebs').get('Status')), delete]
                 self.additional_device.append(tmp)
         except Exception:
-            ''' ntd '''
+            self.additional_device = []
+
         pass
 
-    ''' Parse tags to get instance name '''
+    # Parse tags to get instance name
 
     def __get_name_from_tags(self, tags):
-        ''' Parse all tags to find the instance name '''
+        # Parse all tags to find the instance name
         name = 'No name'
-        for t in tags:
-            if t.get('Key') == 'Name':
-                name = str(t.get('Value'))
+        if tags:
+            for t in tags:
+                if t.get('Key') == 'Name':
+                    name = str(t.get('Value'))
         return name
 
-    ''' Print formatted instance details '''
+    # Print formatted instance details
 
     def print_instance_information_and_options(self):
         name = ('Name not available' if not self.name else self.name)
@@ -91,10 +92,6 @@ class Instance:
         print('- Press ENTER to go back to the previous menu')
         print("\n")
         pass
-
-    ########################################################################################################################
-    # GET
-    ########################################################################################################################
 
     def get_public_ip(self):
         return self.public_ip

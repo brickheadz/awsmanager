@@ -1,6 +1,4 @@
-########################################################################################################################
-#   Include personal library
-########################################################################################################################
+"""Includes"""
 from lib import command
 
 
@@ -14,7 +12,7 @@ class Menu:
         self._command_manager = command.CommandManager()
 
     def print_default_regex_menu(self, error=False):
-        ''' Clean console output '''
+        # Clean console output
         self._command_manager.clear_console()
         if error:
             print("Invalid option provided, please choose another one..\n\n")
@@ -38,7 +36,7 @@ class Menu:
             exit()
         else:
             try:
-                ''' Convert choosed to int and return the regex '''
+                # Convert choosed to int and return the regex
                 return self.__DEFAULT_REGEX[int(choosed)]
             except Exception:
                 return False

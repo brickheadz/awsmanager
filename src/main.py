@@ -52,7 +52,8 @@ def main():
                 found_instance_error = False
                 while True:
                     # Print instance list and options
-                    menu_manager.print_instance_found(aws_manager.get_instance_list(), found_instance_error)
+                    running, stopped = aws_manager.get_instance_list()
+                    menu_manager.print_instance_found(running, stopped, found_instance_error)
                     found_instance_error = False
                     try:
                         choosed_option = input('Input: ')
@@ -62,7 +63,7 @@ def main():
                         continue
                     if choosed_option == 'all':
                         # Start all ssh session
-                        command_manager.open_server_through_ssh(aws_manager.get_instance_list())
+                        command_manager.open_server_through_ssh(running)
                     elif choosed_option == 'refresh':
                         # Refresh instances
                         refresh = True
@@ -74,22 +75,37 @@ def main():
                         print('Script completed.\nBye!')
                         exit()
                     else:
-                        tmp_instance_list = aws_manager.get_instance_list()
                         try:
-                            tmp_inst = tmp_instance_list[int(choosed_option)]
-                            command_manager.clear_console()
-                            tmp_inst.print_instance_information_and_options()
-                            last = input('Input: ')
-                            if last == 'close':
-                                print('Script completed.\nBye!')
-                                exit()
-                            elif last == 'ssh':
-                                print('Starting ssh session..')
-                                command_manager.open_server_through_ssh([tmp_inst])
-                            else:
+                            tmp_inst = running[int(choosed_option)]
+                            found = True
+                        except IndexError:
+                            found = False
+
+                        if not found:
+                            key = int(choosed_option) - len(running)
+                            try:
+                                tmp_inst = stopped[key]
+                            except IndexError:
+                                found_instance_error = True
                                 continue
-                        except Exception:
-                            found_instance_error = True
+
+                        command_manager.clear_console()
+                        tmp_inst.print_instance_information_and_options()
+                        last = input('Input: ')
+                        if last == 'close':
+                            print('Script completed.\nBye!')
+                            exit()
+                        elif last == 'ssh':
+                            print('Starting ssh session..')
+                            command_manager.open_server_through_ssh([tmp_inst])
+                        elif last == 'reboot':
+                            print('Sending reboot command..')
+                            command_manager.reboot_single_instance(tmp_inst)
+                            print('Refresh instance list..')
+                            # Force refresh
+                            refresh = True
+                            break
+                        else:
                             continue
 
 

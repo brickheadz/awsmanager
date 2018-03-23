@@ -41,7 +41,7 @@ class Menu:
             except Exception:
                 return False
 
-    def print_instance_found(self, instances, error=False):
+    def print_instance_found(self, running, stopped, error=False):
         self._command_manager.clear_console()
         if error:
             print("Invalid option provided, please choose another one..\n\n")
@@ -50,13 +50,26 @@ class Menu:
         print('######################################################')
         print('\n')
         i = 0
-        for inst in instances:
-            print('- ' + str(i) + ') ' + inst.name)
-            i = i + 1
+
+        if running:
+            print('################# RUNNING INSTANCES ##################')
+            print('\n')
+            for inst in running:
+                print('- ' + str(i) + ') ' + inst.name)
+                i = i + 1
+            print('\n')
+
+        if stopped:
+            print('################# STOPPED INSTANCES ##################')
+            print('\n')
+            for inst in stopped:
+                print('- ' + str(i) + ') ' + inst.name)
+                i = i + 1
+
         i = i - 1
         print('\n')
         print('- Type 0 to ' + str(i) + ' to show server options')
-        print('- Type *all* to open an SSH into ALL server')
+        print('- Type *all* to open an SSH into ALL RUNNING server')
         print('- Type *refresh* to refresh instances with the same filter')
         print('- Type *restart* to go back to the first menu')
         print('- Type *close* to close this script')

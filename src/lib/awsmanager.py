@@ -19,7 +19,15 @@ class Aws:
         return self.__filter_response(output, regex_filter)
 
     def get_instance_list(self):
-        return self._instances
+        running = []
+        stopped = []
+        for inst in self._instances:
+            # Separate instances by status
+            if inst.status == 'running':
+                running.append(inst)
+            else:
+                stopped.append(inst)
+        return running, stopped
 
     def __filter_response(self, results, regex_filter=None):
         # If a filter is provided, extract only needed data

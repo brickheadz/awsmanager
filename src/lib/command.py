@@ -55,3 +55,16 @@ class CommandManager:
 
             # Sleep to avoid overlapping commands
             time.sleep(1)
+
+    def reboot_single_instance(self, instance):
+        # Send reboot signal to a SINGLE instance
+        if instance.status == 'running':
+            instance_id = instance.get_instance_id()
+            p = sub.Popen(['aws', 'ec2', 'reboot-instances', '--instance-ids', instance_id], stdout=sub.PIPE, stderr=sub.PIPE)
+            output, errors = p.communicate()
+            if errors:
+                # Manage system error
+                print('Error during send request to aws.')
+                print(errors)
+                input('Type *enter* to continue')
+        return

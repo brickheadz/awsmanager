@@ -1,12 +1,25 @@
+""" Includes """
+import datetime
+
+
 class Instance:
 
     def __init__(self, response):
         self.status = str(response.get('State').get('Name'))
         self.monitoring = str(response.get('Monitoring').get('State'))
         self.name = self.__get_name_from_tags(response.get('Tags'))
-        self.launch_time = str(response.get('LaunchTime'))
+        try:
+            launched = datetime.datetime.strptime(str(response.get('LaunchTime')), '%Y-%m-%dT%H:%M:%S.%fZ')
+            delta = datetime.datetime.now() - launched
+            launched = str(launched)
+            self.days_from_start = delta.days
+        except Exception:
+            launched = 'Never launched'
+            self.days_from_start = 0
+        self.launch_time = launched
         self.ena_support = str(response.get('EnaSupport'))
         self.instance_type = str(response.get('InstanceType'))
+        self.instance_id = str(response.get('InstanceId'))
 
         self.public_dns = str(response.get('PublicDnsName'))
         self.public_ip = str(response.get('PublicIpAddress'))
@@ -56,7 +69,9 @@ class Instance:
         print("# Base informations")
         print('- Status: ' + ('None' if not self.status else self.status))
         print('- Monitoring: ' + ('None' if not self.monitoring else self.monitoring))
-        print('- Launched: ' + ('None' if not self.launch_time else self.launch_time))
+        print('- Launched: ' + (
+            'None' if not self.launch_time else self.launch_time + ' (' + str(self.days_from_start) + ' days ago)'))
+        print('- Instance Id: '+('None' if not self.instance_id else self.instance_id))
         print('- Type: ' + ('None' if not self.instance_type else self.instance_type))
         print('- Ena supported: ' + ('TRUE' if self.instance_type else 'FALSE'))
         print('\n')
@@ -88,6 +103,7 @@ class Instance:
                 i = i + 1
         print("\n")
         print('- Type *ssh* to open an ssh connection to the server')
+        print('- Type *reboot* to reboot this server')
         print('- Type *close* to close this script')
         print('- Press ENTER to go back to the previous menu')
         print("\n")
@@ -98,3 +114,6 @@ class Instance:
 
     def get_name(self):
         return 'Name not available' if not self.name else self.name
+
+    def get_instance_id(self):
+        return self.instance_id
